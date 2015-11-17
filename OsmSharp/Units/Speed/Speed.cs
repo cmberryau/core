@@ -47,7 +47,7 @@ namespace OsmSharp.Units.Speed
         {
             result = null;
 
-            if (string.IsNullOrWhiteSpace(s))
+            if (s.IsNullOrWhiteSpace())
                 return false;
 
             // try a generic parse first, in this case assume kilometers per hour.

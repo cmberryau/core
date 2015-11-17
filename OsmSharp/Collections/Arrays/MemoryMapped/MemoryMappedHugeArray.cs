@@ -194,7 +194,7 @@ namespace OsmSharp.Collections.Arrays.MemoryMapped
         {
             if (item.IsDirty)
             {
-                long arrayIdx = (long)System.Math.Floor(item.Position / _fileElementSize);
+                long arrayIdx = Convert.ToInt64(System.Math.Floor(Convert.ToSingle(item.Position / _fileElementSize)));
                 long localIdx = item.Position % _fileElementSize;
                 long localPosition = localIdx * _elementSize;
 
@@ -223,7 +223,7 @@ namespace OsmSharp.Collections.Arrays.MemoryMapped
                 {
                     var newBuffer = new T[_bufferSize];
 
-                    var arrayIdx = (long)System.Math.Floor(bufferPosition / _fileElementSize);
+                    var arrayIdx = Convert.ToInt64(System.Math.Floor(Convert.ToSingle(bufferPosition / _fileElementSize)));
                     var localIdx = bufferPosition % _fileElementSize;
                     var localPosition = localIdx * _elementSize;
 

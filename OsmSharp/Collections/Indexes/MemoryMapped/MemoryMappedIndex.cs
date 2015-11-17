@@ -178,7 +178,7 @@ namespace OsmSharp.Collections.Indexes.MemoryMapped
             if (_readOnly) { throw new InvalidOperationException("This index is readonly."); }
 
             var id = _position;
-            var accessorId = (int)System.Math.Floor(_position / _accessorSizeInBytes);
+            var accessorId = Convert.ToInt32(System.Math.Floor(Convert.ToSingle(_position / _accessorSizeInBytes)));
             if (accessorId == _accessors.Count)
             { // add new accessor.
                 _accessors.Add(this.CreateAccessor(_file, _accessorSizeInBytes));
@@ -216,7 +216,7 @@ namespace OsmSharp.Collections.Indexes.MemoryMapped
         /// <returns>True if an element with the given id was found.</returns>
         public override bool TryGet(long id, out T element)
         {
-            var accessorId = (int)System.Math.Floor(id / _accessorSizeInBytes);
+            var accessorId = Convert.ToInt32(System.Math.Floor(Convert.ToSingle(id / _accessorSizeInBytes)));
             if (accessorId >= _accessors.Count)
             {
                 element = default(T);

@@ -19,8 +19,8 @@
 using OsmSharp.Geo.Attributes;
 using OsmSharp.Geo.Features;
 using OsmSharp.Geo.Geometries;
-using OsmSharp.IO.Json;
-using OsmSharp.IO.Json.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OsmSharp.Math.Geo;
 using System;
 using System.Collections.Generic;

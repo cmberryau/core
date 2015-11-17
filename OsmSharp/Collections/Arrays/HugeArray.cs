@@ -78,7 +78,7 @@ namespace OsmSharp.Collections.Arrays
             }
             set
             {
-                long block = (long)System.Math.Floor(idx / _blockSize);
+                long block = Convert.ToInt64(System.Math.Floor(Convert.ToSingle(idx / _blockSize)));
                 long localIdx = idx % _blockSize;
                 blocks[block][localIdx] = value;
             }

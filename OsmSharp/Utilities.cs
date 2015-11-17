@@ -34,6 +34,40 @@ namespace OsmSharp
     public static class Utilities
     {
         /// <summary>
+        /// Extension for String.IsNullOrWhiteSpace for .NET 3.5 compatibility
+        /// </summary>
+        public static bool IsNullOrWhiteSpace(this string value)
+        {
+            if (value == null)
+                return true;
+
+            return string.IsNullOrEmpty(value.Trim());
+        }
+
+        private const int BufferSize = 16 * 1024;
+
+        /// <summary>
+        /// Extension for Stream.CopyTo for .NET 3.5
+        /// </summary>
+        /// <param name="output">The stream to copy to</param>
+        public static void CopyTo(this Stream input, Stream output)
+        {
+            if(output == null)
+            {
+                throw new ArgumentNullException(nameof(output));
+            }
+
+            var buffer = new byte[BufferSize];
+
+            int bytes_read;
+
+            while((bytes_read = input.Read(buffer, 0, BufferSize)) > 0)
+            {
+                output.Write(buffer, 0, bytes_read);
+            }
+        }
+
+        /// <summary>
         /// Returns the largest power of 10 that is smaller than value.
         /// </summary>
         /// <param name="value"></param>
@@ -691,7 +725,7 @@ namespace OsmSharp
         /// <returns>true if the value parameter was converted successfully; otherwise, false.</returns>
         public static bool TryParse<TEnum>(string value, out TEnum result) where TEnum : struct
         {
-            return Enum.TryParse<TEnum>(value, out result);
+            return EnumTryParse<TEnum>(value, out result);
         }
 
         /// <summary>
@@ -705,7 +739,35 @@ namespace OsmSharp
         /// <returns>true if the value parameter was converted successfully; otherwise, false.</returns>
         public static bool TryParse<TEnum>(string value, bool ignoreCase, out TEnum result) where TEnum : struct
         {
-            return Enum.TryParse<TEnum>(value, ignoreCase, out result);
+            return EnumTryParse<TEnum>(value, out result, ignoreCase);
+        }
+
+        /// <summary>
+        /// .NET 3.5 compatible TryParse function
+        /// </summary>
+        private static bool EnumTryParse<T>(string value, out T result, bool ignore_case = true)
+        {
+            string value_string_fixed = value.Replace(' ', '_');
+
+            if (Enum.IsDefined(typeof(T), value_string_fixed))
+            {
+                result = (T)Enum.Parse(typeof(T), value_string_fixed);
+                return true;
+            }
+            else
+            {
+                foreach (string value_name in Enum.GetNames(typeof(T)))
+                {
+                    if (value_name.Equals(value_string_fixed, ignore_case ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+                    {
+                        result = (T)Enum.Parse(typeof(T), value_name);
+                        return true;
+                    }
+                }
+            }
+
+            result = default(T);
+            return false;
         }
 
         /// <summary>

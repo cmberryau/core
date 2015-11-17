@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || NET35
 
 // ReSharper disable CheckNamespace
 namespace OsmSharp
