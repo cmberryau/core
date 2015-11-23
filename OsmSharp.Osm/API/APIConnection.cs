@@ -81,11 +81,9 @@ namespace OsmSharp.Osm.API
         {
             WebRequest request = WebRequest.Create(new Uri(this.Uri.AbsoluteUri + url));
             this.SetBasicAuthHeader(request);
-            HttpWebResponse response;
-            Encoding enc;
-            StreamReader responseStream;
             string responseString;
             Stream requestStream;
+
             switch (method)
             {
                 case Method.PUT:
@@ -97,17 +95,18 @@ namespace OsmSharp.Osm.API
                     requestStream.Dispose();
 
                     // get the response.
-                    response = (HttpWebResponse)request.GetResponse();
-                    enc = System.Text.Encoding.GetEncoding("Windows-1252");
-                    responseStream =
-                       new StreamReader(response.GetResponseStream(), enc);
-                    responseString = responseStream.ReadToEnd();
+                    using (var response = (HttpWebResponse)request.GetResponse())
+                    {
+                        var enc = Encoding.GetEncoding("Windows-1252");
 
-                    // close everything.
-                    response.Dispose();
-                    responseStream.Dispose();
+                        using (var responseStream = new StreamReader(response.GetResponseStream(), enc))
+                        {
+                            responseString = responseStream.ReadToEnd();
+                        }
+                    }
 
                     return responseString;
+
                 case Method.GET:
                     responseString = string.Empty;
                     try
@@ -115,15 +114,15 @@ namespace OsmSharp.Osm.API
                         request.Method = "GET";
 
                         // get the response.
-                        response = (HttpWebResponse)request.GetResponse();
-                        enc = System.Text.Encoding.GetEncoding("Windows-1252");
-                        responseStream =
-                           new StreamReader(response.GetResponseStream(), enc);
-                        responseString = responseStream.ReadToEnd();
+                        using (var response = (HttpWebResponse)request.GetResponse())
+                        {
+                            var enc = Encoding.GetEncoding("Windows-1252");
 
-                        // close everything.
-                        response.Dispose();
-                        responseStream.Dispose();
+                            using (var responseStream = new StreamReader(response.GetResponseStream(), enc))
+                            {
+                                responseString = responseStream.ReadToEnd();
+                            }
+                        }
                     }
                     catch (WebException ex)
                     {
@@ -148,6 +147,7 @@ namespace OsmSharp.Osm.API
                     }
 
                     return responseString;
+
                 case Method.DELETE:
                     request.Method = "DELETE";
 
@@ -157,17 +157,17 @@ namespace OsmSharp.Osm.API
                     requestStream.Dispose();
 
                     // get the response.
-                    response = (HttpWebResponse)request.GetResponse();
-                    enc = System.Text.Encoding.GetEncoding("Windows-1252");
-                    responseStream =
-                       new StreamReader(response.GetResponseStream(), enc);
-                    responseString = responseStream.ReadToEnd();
-
-                    // close everything.
-                    response.Dispose();
-                    responseStream.Dispose();
+                    using (var response = (HttpWebResponse)request.GetResponse())
+                    {
+                        var enc = Encoding.GetEncoding("Windows-1252");
+                        using (var responseStream = new StreamReader(response.GetResponseStream(), enc))
+                        {
+                            responseString = responseStream.ReadToEnd();
+                        }
+                    }
 
                     return responseString;
+
                 default:
                     throw new NotSupportedException(string.Format("Method {0} not supported!",
                         method.ToString()));
