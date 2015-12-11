@@ -34,14 +34,32 @@ namespace OsmSharp
     public static class Utilities
     {
         /// <summary>
-        /// Extension for String.IsNullOrWhiteSpace for .NET 3.5 compatibility
+        /// Replacement for List.AddRange to compatibilize with .NET 3.5
         /// </summary>
-        public static bool IsNullOrWhiteSpace(this string value)
+        /// <param name="destination">The desintation for the objects to be added</param>
+        ///<param name="source">The source from which to get the objects from</param>
+        public static void AddRange<T, B>(this ICollection<T> destination, IEnumerable<B> source) where B : T
         {
-            if (value == null)
-                return true;
+            foreach (B item in source)
+            {
+                destination.Add(item);
+            }
+        }
 
-            return string.IsNullOrEmpty(value.Trim());
+        /// <summary>
+        /// Replacement for Dictionary.Values to compatibilize with .NET 3.5
+        /// </summary>
+		/// <param name="dictionary">The dictionary to get values from</param>
+        public static List<B> Values<T, B>(this IDictionary<T, B> dictionary)
+        {
+            var list = new List<B>();
+
+            foreach (var kv in dictionary)
+            {
+                list.Add(kv.Value);
+            }
+
+            return list;
         }
 
         private const int BufferSize = 16 * 1024;
@@ -52,7 +70,7 @@ namespace OsmSharp
         /// <param name="output">The stream to copy to</param>
         public static void CopyTo(this Stream input, Stream output)
         {
-            if(output == null)
+            if (output == null)
             {
                 throw new ArgumentNullException(nameof(output));
             }
@@ -61,10 +79,23 @@ namespace OsmSharp
 
             int bytes_read;
 
-            while((bytes_read = input.Read(buffer, 0, BufferSize)) > 0)
+            while ((bytes_read = input.Read(buffer, 0, BufferSize)) > 0)
             {
                 output.Write(buffer, 0, bytes_read);
             }
+        }
+
+        /// <summary>
+        /// Extension for String.IsNullOrWhiteSpace for .NET 3.5 compatibility
+        /// </summary>
+        public static bool IsNullOrWhiteSpace(this string value)
+        {
+            if (value == null)
+            {
+                return true;
+            }
+
+            return string.IsNullOrEmpty(value.Trim());
         }
 
         /// <summary>

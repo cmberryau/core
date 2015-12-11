@@ -121,6 +121,7 @@
     <Compile Include="Collections\Tags\TagsCollectionBase.cs" />
     <Compile Include="Collections\Tags\TagsTableCollection.cs" />
     <Compile Include="Collections\Tags\Index\TagsIndex.cs" />
+    <Compile Include="Collections\Tuple.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Data\SQLite\SQLiteConnectionBase.cs" />
     <Compile Include="Encoding\ASCIIEncoding.cs" />
