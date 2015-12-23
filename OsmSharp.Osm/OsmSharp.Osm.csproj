@@ -78,6 +78,8 @@
     <Compile Include="API\APIException.cs" />
     <Compile Include="Cache\OsmDataCache.cs" />
     <Compile Include="Cache\OsmDataCacheMemory.cs" />
+    <Compile Include="Cache\OsmDataCacheMemoryThreadSafe.cs" />
+    <Compile Include="Cache\TagsCollectionCache.cs" />
     <Compile Include="Change.cs" />
     <Compile Include="ChangeSet.cs" />
     <Compile Include="ChangeSetInfo.cs" />
