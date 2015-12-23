@@ -34,6 +34,31 @@ namespace OsmSharp
     public static class Utilities
     {
         /// <summary>
+        /// Creates a comma seperated string for the given list of strings
+        /// </summary>
+        public static string CommaSeperatedString(this List<string> values)
+        {
+            if(values == null)
+            {
+                throw new ArgumentNullException(nameof(values));
+            }
+
+            var sb = new StringBuilder();
+
+            for (var i = 0; i < values.Count; i++)
+            {
+                sb.Append("'" + values[i] + "'");
+
+                if (i < values.Count - 1)
+                {
+                    sb.Append(", ");
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Replacement for List.AddRange to compatibilize with .NET 3.5
         /// </summary>
         /// <param name="destination">The desintation for the objects to be added</param>
