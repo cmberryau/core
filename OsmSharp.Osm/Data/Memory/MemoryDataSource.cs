@@ -126,7 +126,7 @@ namespace OsmSharp.Osm.Data.Memory
         /// <summary>
         /// Returns true if there is a bounding box.
         /// </summary>
-        public override bool HasBoundinBox
+        public override bool HasBoundingBox
         {
             get { return true; }
         }

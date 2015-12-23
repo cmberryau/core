@@ -46,7 +46,7 @@ namespace OsmSharp.Osm.Data
         /// <summary>
         /// Returns true if this datasource is bounded.
         /// </summary>
-        bool HasBoundinBox { get; }
+        bool HasBoundingBox { get; }
 
         /// <summary>
         /// Returns true if this datasource is readonly.

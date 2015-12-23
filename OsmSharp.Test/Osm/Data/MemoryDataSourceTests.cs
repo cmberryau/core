@@ -131,7 +131,7 @@ namespace OsmSharp.Test.Osm.Data
             node.Latitude = 1;
             dataSource.AddNode(node);
 
-            Assert.IsTrue(dataSource.HasBoundinBox);
+            Assert.IsTrue(dataSource.HasBoundingBox);
             GeoCoordinateBox box = dataSource.BoundingBox;
             Assert.AreEqual(1, box.MaxLat);
             Assert.AreEqual(2, box.MaxLon);

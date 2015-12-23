@@ -166,7 +166,7 @@ namespace OsmSharp.Osm.Data
         /// <summary>
         /// Returns true if this datasource has a boundingbox.
         /// </summary>
-        public abstract bool HasBoundinBox
+        public abstract bool HasBoundingBox
         {
             get;
         }

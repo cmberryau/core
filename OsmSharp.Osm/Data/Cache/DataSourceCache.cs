@@ -87,9 +87,9 @@ namespace OsmSharp.Osm.Data.Cache
         /// <summary>
         /// Returns true if this datasource is bounded.
         /// </summary>
-        public override bool HasBoundinBox
+        public override bool HasBoundingBox
         {
-            get { return _source.HasBoundinBox; }
+            get { return _source.HasBoundingBox; }
         }
 
         /// <summary>
