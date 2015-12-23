@@ -101,6 +101,7 @@
     <Compile Include="Data\IWaySource.cs" />
     <Compile Include="Data\KeyGenerator.cs" />
     <Compile Include="Data\Memory\MemoryDataSource.cs" />
+    <Compile Include="Data\SchemaTools.cs" />
     <Compile Include="Filters\Filter.cs" />
     <Compile Include="Filters\FilterAny.cs" />
     <Compile Include="Filters\FilterBox.cs" />
