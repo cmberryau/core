@@ -27,163 +27,205 @@ namespace OsmSharp.Osm.Cache
     public abstract class OsmDataCache : IOsmGeoSource
     {
         /// <summary>
-        /// Adds a new node.
+        /// The number of nodes held in the cache
         /// </summary>
-        /// <param name="node"></param>
+        public abstract int NodeCount
+        {
+            get;
+        }
+
+        /// <summary>
+        /// The number of ways held in the cache
+        /// </summary>
+        public abstract int WayCount
+        {
+            get;
+        }
+
+        /// <summary>
+        /// The number of relations held in the cache
+        /// </summary>
+        public abstract int RelationCount
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Adds a node
+        /// </summary>
         public abstract void AddNode(Node node);
 
         /// <summary>
-        /// Returns the node with the given id if present.
+        /// Adds a list of nodes
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        public abstract void AddNodes(IList<Node> nodes);
+
+        /// <summary>
+        /// Adds a dictionary of node ids and nodes
+        /// </summary>
+        public abstract void AddNodes(IDictionary<long, Node> nodes);
+
+        /// <summary>
+        /// Returns the node with the given id if present
+        /// </summary>
         public Node GetNode(long id)
         {
             Node node;
-            if (this.TryGetNode(id, out node))
+
+            if (TryGetNode(id, out node))
             {
                 return node;
             }
+
             return null;
         }
 
         /// <summary>
-        /// Removes the node with the given id.
+        /// Returns a dictionary of fetched nodes given the ids
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="ids">The ids of the nodes to fetch</param>
+        /// <param name="remaining_ids">The ids that were unable to be found</param>
+        public abstract IDictionary<long, Node> GetNodes(IList<long> ids, out IList<long> remaining_ids);
+
+        /// <summary>
+        /// Returns a list of fetched nodes given the ids
+        /// </summary>
+        /// <param name="ids">The ids of the nodes to fetch</param>
+        /// <param name="remaining_ids">The ids that were unable to be found</param>
+        public abstract IList<Node> GetNodesList(IList<long> ids, out IList<long> remaining_ids);
+
+        /// <summary>
+        /// Removes the node with the given id
+        /// </summary>
         public abstract bool RemoveNode(long id);
 
         /// <summary>
-        /// Retruns true if the node exists.
+        /// Retruns true if the node exists
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public virtual bool ContainsNode(long id)
-        {
-            Node node;
-            return (this.TryGetNode(id, out node));
-        }
+        public abstract bool ContainsNode(long id);
 
         /// <summary>
-        /// Tries to get the node with the given id.
+        /// Tries to get the node with the given id
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="node"></param>
-        /// <returns></returns>
         public abstract bool TryGetNode(long id, out Node node);
 
-        ///// <summary>
-        ///// Returns a enumerable of all nodes in this cache.
-        ///// </summary>
-        ///// <returns></returns>
-        //public abstract IEnumerable<Node> GetNodes();
-
         /// <summary>
-        /// Adds a new way.
+        /// Adds a way
         /// </summary>
-        /// <param name="way"></param>
         public abstract void AddWay(Way way);
 
         /// <summary>
-        /// Removes the way with the given id.
+        /// Adds a list of ways
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public abstract bool RemoveWay(long id);
+        public abstract void AddWays(IList<Way> ways);
 
         /// <summary>
-        /// Returns the way with the given id if present.
+        /// Adds a dictionary of ways
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        public abstract void AddWays(IDictionary<long, Way> ways);
+
+        /// <summary>
+        /// Returns the way with the given id if present
+        /// </summary>
         public Way GetWay(long id)
         {
             Way way;
-            if (this.TryGetWay(id, out way))
+
+            if (TryGetWay(id, out way))
             {
                 return way;
             }
+
             return null;
         }
 
         /// <summary>
-        /// Retruns true if the way exists.
+        /// Returns a dictionary of fetched ways given the ids
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public virtual bool ContainsWay(long id)
-        {
-            Way way;
-            return (this.TryGetWay(id, out way));
-        }
+        /// <param name="ids">The ids of the ways to fetch</param>
+        /// <param name="remaining_ids">The ids that were unable to be found</param>
+        public abstract IDictionary<long, Way> GetWays(IList<long> ids, out IList<long> remaining_ids);
 
         /// <summary>
-        /// Tries to get the way with the given id.
+        /// Returns a list of fetched ways given the ids
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="way"></param>
-        /// <returns></returns>
+        /// <param name="ids">The ids of the ways to fetch</param>
+        /// <param name="remaining_ids">The ids that were unable to be found</param>
+        public abstract IList<Way> GetWaysList(IList<long> ids, out IList<long> remaining_ids);
+
+        /// <summary>
+        /// Removes the way with the given id
+        /// </summary>
+        public abstract bool RemoveWay(long id);
+
+        /// <summary>
+        /// Returns true if the way exists
+        /// </summary>
+        public abstract bool ContainsWay(long id);
+
+        /// <summary>
+        /// Tries to get the way with the given id
+        /// </summary>
         public abstract bool TryGetWay(long id, out Way way);
 
-        ///// <summary>
-        ///// Returns a enumerable of all ways in this cache.
-        ///// </summary>
-        ///// <returns></returns>
-        //public abstract IEnumerable<Way> GetWays();
+        /// <summary>
+        /// Adds a new relation
+        /// </summary>
+        public abstract void AddRelation(Relation relation);
 
         /// <summary>
-        /// Adds a new relation.
+        /// Adds a list of relations
         /// </summary>
-        /// <param name="relation"></param>
-        public abstract void AddRelation(Relation relation);
+        public abstract void AddRelations(IList<Relation> relations);
+
+        /// <summary>
+        /// Adds a dictionary of relations
+        /// </summary>
+        public abstract void AddRelations(IDictionary<long, Relation> relations);
 
         /// <summary>
         /// Returns the relation with the given id if present.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public Relation GetRelation(long id)
         {
             Relation relation;
-            if (this.TryGetRelation(id, out relation))
+
+            if (TryGetRelation(id, out relation))
             {
                 return relation;
             }
+
             return null;
         }
 
         /// <summary>
-        /// Removes the relation with the given id.
+        /// Returns a dictionary of fetched relations given the ids
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="ids">The ids of the relations to fetch</param>
+        /// <param name="remaining_ids">The ids that were unable to be found</param>
+        public abstract IDictionary<long, Relation> GetRelations(IList<long> ids, out IList<long> remaining_ids);
+
+        /// <summary>
+        /// Returns a list of fetched relations given the ids
+        /// </summary>
+        /// <param name="ids">The ids of the relations to fetch</param>
+        /// <param name="remaining_ids">The ids that were unable to be found</param>
+        public abstract IList<Relation> GetRelationsList(IList<long> ids, out IList<long> remaining_ids);
+
+        /// <summary>
+        /// Removes the relation with the given id
+        /// </summary>
         public abstract bool RemoveRelation(long id);
 
         /// <summary>
-        /// Retruns true if the relation exists.
+        /// Retruns true if the relation exists
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public virtual bool ContainsRelation(long id)
-        {
-            Relation relation;
-            return (this.TryGetRelation(id, out relation));
-        }
+        public abstract bool ContainsRelation(long id);
 
         /// <summary>
-        /// Tries to get the relation with the given id.
+        /// Tries to get the relation with the given id
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="relation"></param>
-        /// <returns></returns>
         public abstract bool TryGetRelation(long id, out Relation relation);
-
-        ///// <summary>
-        ///// Returns an enumerable of all relations in this cache.
-        ///// </summary>
-        ///// <returns></returns>
-        //public abstract IEnumerable<Relation> GetRelations();
 
         /// <summary>
         /// Clears all data from this cache.

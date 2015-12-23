@@ -18,9 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using OsmSharp.Collections;
 
 namespace OsmSharp.Osm.Cache
 {
@@ -29,154 +26,490 @@ namespace OsmSharp.Osm.Cache
     /// </summary>
     public class OsmDataCacheMemory : OsmDataCache
     {
-        private Dictionary<long, Node> _nodes;
-        private Dictionary<long, Way> _ways;
-        private Dictionary<long, Relation> _relations;
+        /// <summary>
+        /// The number of nodes held in the cache
+        /// </summary>
+        public override int NodeCount
+        {
+            get
+            {
+                return Nodes.Count;
+            }
+        }
 
         /// <summary>
-        /// Creates a new osm data cache for simple OSM objects kept in memory.
+        /// The number of ways held in the cache
+        /// </summary>
+        public override int WayCount
+        {
+            get
+            {
+                return Ways.Count;
+            }
+        }
+
+        /// <summary>
+        /// The number of relations held in the cache
+        /// </summary>
+        public override int RelationCount
+        {
+            get
+            {
+                return Relations.Count;
+            }
+        }
+
+        protected readonly IDictionary<long, Node> Nodes;
+        protected readonly IDictionary<long, Way> Ways;
+        protected readonly IDictionary<long, Relation> Relations;
+
+        /// <summary>
+        /// Creates a new instance of OsmDataCacheMemory
         /// </summary>
         public OsmDataCacheMemory()
         {
-            _nodes = new Dictionary<long, Node>();
-            _ways = new Dictionary<long, Way>();
-            _relations = new Dictionary<long, Relation>();
+            Nodes = new Dictionary<long, Node>();
+            Ways = new Dictionary<long, Way>();
+            Relations = new Dictionary<long, Relation>();
         }
 
         /// <summary>
-        /// 
+        /// Adds a node
         /// </summary>
-        /// <param name="node"></param>
         public override void AddNode(Node node)
         {
-            if (node == null) throw new ArgumentNullException("node");
-            if (node.Id == null) throw new Exception("node.Id is null");
+            if (node == null)
+            {
+                throw new ArgumentNullException("node");
+            }
 
-            _nodes[node.Id.Value] = node;
+            if (node.Id == null)
+            {
+                throw new Exception("node.Id is null");
+            }
+
+            Nodes[node.Id.Value] = node;
         }
 
         /// <summary>
-        /// Removes the node with the given id.
+        /// Adds a list of nodes
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        public override void AddNodes(IList<Node> nodes)
+        {
+            if (nodes == null)
+            {
+                throw new ArgumentNullException("nodes");
+            }
+
+            foreach (var node in nodes)
+            {
+                if (!Nodes.ContainsKey(node.Id.Value))
+                {
+                    Nodes[node.Id.Value] = node;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds a dictionary of node ids and nodes
+        /// </summary>
+        public override void AddNodes(IDictionary<long, Node> nodes)
+        {
+            if (nodes == null)
+            {
+                throw new ArgumentNullException("nodes");
+            }
+
+            foreach (var node in nodes)
+            {
+                if (!Nodes.ContainsKey(node.Key))
+                {
+                    Nodes[node.Key] = node.Value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns a dictionary of fetched nodes given the ids
+        /// </summary>
+        /// <param name="ids">The ids of the nodes to fetch</param>
+        /// <param name="remaining_ids">The ids that were unable to be found</param>
+        public override IDictionary<long, Node> GetNodes(IList<long> ids, out IList<long> remaining_ids)
+        {
+            if (ids == null)
+            {
+                throw new ArgumentNullException("ids");
+            }
+
+            var nodes = new Dictionary<long, Node>();
+            remaining_ids = new List<long>();
+
+            foreach (var id in ids)
+            {
+                if (Nodes.ContainsKey(id))
+                {
+                    nodes[id] = Nodes[id];
+                }
+                else
+                {
+                    remaining_ids.Add(id);
+                }
+            }
+
+            return nodes;
+        }
+
+        /// <summary>
+        /// Returns a list of fetched nodes given the ids
+        /// </summary>
+        /// <param name="ids">The ids of the nodes to fetch</param>
+        /// <param name="remaining_ids">The ids that were unable to be found</param>
+        public override IList<Node> GetNodesList(IList<long> ids, out IList<long> remaining_ids)
+        {
+            if (ids == null)
+            {
+                throw new ArgumentNullException("ids");
+            }
+
+            var nodes = new List<Node>();
+            remaining_ids = new List<long>();
+
+            foreach (var id in ids)
+            {
+                if (Nodes.ContainsKey(id))
+                {
+                    if (!nodes.Contains(Nodes[id]))
+                    {
+                        nodes.Add(Nodes[id]);
+                    }
+                }
+                else
+                {
+                    remaining_ids.Add(id);
+                }
+            }
+
+            return nodes;
+        }
+
+        /// <summary>
+        /// Removes the node with the given id
+        /// </summary>
         public override bool RemoveNode(long id)
         {
-            return _nodes.Remove(id);
+            return Nodes.Remove(id);
         }
 
         /// <summary>
-        /// 
+        /// Returns true if the node exists
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="node"></param>
-        /// <returns></returns>
+        public override bool ContainsNode(long id)
+        {
+            return Nodes.ContainsKey(id);
+        }
+
+        /// <summary>
+        /// Returns true if the node given the id was successfully fetched
+        /// </summary>
         public override bool TryGetNode(long id, out Node node)
         {
-            return _nodes.TryGetValue(id, out node);
+            return Nodes.TryGetValue(id, out node);
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <returns></returns>
-        //public override IEnumerable<Node> GetNodes()
-        //{
-        //    return _nodes.Values;
-        //}
-
         /// <summary>
-        /// 
+        /// Adds a way
         /// </summary>
-        /// <param name="way"></param>
         public override void AddWay(Way way)
         {
-            if (way == null) throw new ArgumentNullException("way");
-            if (way.Id == null) throw new Exception("way.Id is null");
+            if (way == null)
+            {
+                throw new ArgumentNullException("way");
+            }
 
-            _ways[way.Id.Value] = way;
+            if (way.Id == null)
+            {
+                throw new Exception("way.Id is null");
+            }
+
+            Ways[way.Id.Value] = way;
         }
 
         /// <summary>
-        /// Removes the way with the given id.
+        /// Adds a list of ways
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        public override void AddWays(IList<Way> ways)
+        {
+            if (ways == null)
+            {
+                throw new ArgumentNullException("ways");
+            }
+
+            foreach (var way in ways)
+            {
+                if (!Ways.ContainsKey(way.Id.Value))
+                {
+                    Ways[way.Id.Value] = way;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds a dictionary of ways
+        /// </summary>
+        public override void AddWays(IDictionary<long, Way> ways)
+        {
+            if (ways == null)
+            {
+                throw new ArgumentNullException("ways");
+            }
+
+            foreach (var way in ways)
+            {
+                Ways[way.Key] = way.Value;
+            }
+        }
+
+        /// <summary>
+        /// Returns a dictionary of fetched ways given the ids
+        /// </summary>
+        /// <param name="ids">The ids of the ways to fetch</param>
+        /// <param name="remaining_ids">The ids that were unable to be found</param>
+        public override IDictionary<long, Way> GetWays(IList<long> ids, out IList<long> remaining_ids)
+        {
+            if (ids == null)
+            {
+                throw new ArgumentNullException("ids");
+            }
+
+            var ways = new Dictionary<long, Way>();
+            remaining_ids = new List<long>();
+
+            foreach (var id in ids)
+            {
+                if (Ways.ContainsKey(id))
+                {
+                    ways[id] = Ways[id];
+                }
+                else
+                {
+                    remaining_ids.Add(id);
+                }
+            }
+
+            return ways;
+        }
+
+        /// <summary>
+        /// Returns a list of fetched ways given the ids
+        /// </summary>
+        /// <param name="ids">The ids of the ways to fetch</param>
+        /// <param name="remaining_ids">The ids that were unable to be found</param>
+        public override IList<Way> GetWaysList(IList<long> ids, out IList<long> remaining_ids)
+        {
+            if (ids == null)
+            {
+                throw new ArgumentNullException("ids");
+            }
+
+            var ways = new List<Way>();
+            remaining_ids = new List<long>();
+
+            foreach (var id in ids)
+            {
+                if (Ways.ContainsKey(id))
+                {
+                    if (!ways.Contains(Ways[id]))
+                    {
+                        ways.Add(Ways[id]);
+                    }
+                }
+                else
+                {
+                    if (!remaining_ids.Contains(id))
+                    {
+                        remaining_ids.Add(id);
+                    }
+                }
+            }
+
+            return ways;
+        }
+
+        /// <summary>
+        /// Removes the way with the given id
+        /// </summary>
         public override bool RemoveWay(long id)
         {
-            return _ways.Remove(id);
+            return Ways.Remove(id);
         }
 
         /// <summary>
-        /// 
+        /// Returns true if the way exists
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="way"></param>
-        /// <returns></returns>
+        public override bool ContainsWay(long id)
+        {
+            return Ways.ContainsKey(id);
+        }
+
+        /// <summary>
+        /// Returns true if the way given the id was successfully fetched
+        /// </summary>
         public override bool TryGetWay(long id, out Way way)
         {
-            return _ways.TryGetValue(id, out way);
+            return Ways.TryGetValue(id, out way);
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <returns></returns>
-        //public override IEnumerable<Way> GetWays()
-        //{
-        //    return _ways.Values;
-        //}
-
         /// <summary>
-        /// 
+        /// Adds a new relation
         /// </summary>
-        /// <param name="relation"></param>
         public override void AddRelation(Relation relation)
         {
-            if (relation == null) throw new ArgumentNullException("relation");
-            if (relation.Id == null) throw new Exception("relation.Id is null");
+            if (relation == null)
+            {
+                throw new ArgumentNullException("relation");
+            }
 
-            _relations[relation.Id.Value] = relation;
+            if (relation.Id == null)
+            {
+                throw new Exception("relation.Id is null");
+            }
+
+            Relations[relation.Id.Value] = relation;
         }
 
         /// <summary>
-        /// Removes the relation with the given id.
+        /// Adds a list of relations
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        public override void AddRelations(IList<Relation> relations)
+        {
+            if (relations == null)
+            {
+                throw new ArgumentNullException("relations");
+            }
+
+            foreach (var relation in relations)
+            {
+                if (!Relations.ContainsKey(relation.Id.Value))
+                {
+                    Relations[relation.Id.Value] = relation;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds a dictionary of relations
+        /// </summary>
+        public override void AddRelations(IDictionary<long, Relation> relations)
+        {
+            if (relations == null)
+            {
+                throw new ArgumentNullException("relations");
+            }
+
+            foreach (var relation in relations)
+            {
+                if (!Relations.ContainsKey(relation.Key))
+                {
+                    Relations[relation.Key] = relation.Value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns a dictionary of fetched relations given the ids
+        /// </summary>
+        /// <param name="ids">The ids of the relations to fetch</param>
+        /// <param name="remaining_ids">The ids that were unable to be found</param>
+        public override IDictionary<long, Relation> GetRelations(IList<long> ids, out IList<long> remaining_ids)
+        {
+            if (ids == null)
+            {
+                throw new ArgumentNullException("ids");
+            }
+
+            var relations = new Dictionary<long, Relation>();
+            remaining_ids = new List<long>();
+
+            foreach (var id in ids)
+            {
+                if (Relations.ContainsKey(id))
+                {
+                    relations[id] = Relations[id];
+                }
+                else
+                {
+                    remaining_ids.Add(id);
+                }
+            }
+
+            return relations;
+        }
+
+        /// <summary>
+        /// Returns a list of fetched relations given the ids
+        /// </summary>
+        /// <param name="ids">The ids of the relations to fetch</param>
+        /// <param name="remaining_ids">The ids that were unable to be found</param>
+        public override IList<Relation> GetRelationsList(IList<long> ids, out IList<long> remaining_ids)
+        {
+            if (ids == null)
+            {
+                throw new ArgumentNullException("ids");
+            }
+
+            var relations = new List<Relation>();
+            remaining_ids = new List<long>();
+
+            foreach (var id in ids)
+            {
+                if (Relations.ContainsKey(id))
+                {
+                    if (!relations.Contains(Relations[id]))
+                    {
+                        relations.Add(Relations[id]);
+                    }
+                }
+                else
+                {
+                    remaining_ids.Add(id);
+                }
+            }
+
+            return relations;
+        }
+
+        /// <summary>
+        /// Removes the relation with the given id
+        /// </summary>
         public override bool RemoveRelation(long id)
         {
-            return _relations.Remove(id);
+            return Relations.Remove(id);
         }
 
         /// <summary>
-        /// 
+        /// Retruns true if the relation exists
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="relation"></param>
-        /// <returns></returns>
+        public override bool ContainsRelation(long id)
+        {
+            return Relations.ContainsKey(id);
+        }
+
+        /// <summary>
+        /// Returns true if the relation given the id was successfully fetched
+        /// </summary>
         public override bool TryGetRelation(long id, out Relation relation)
         {
-            return _relations.TryGetValue(id, out relation);
+            return Relations.TryGetValue(id, out relation);
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <returns></returns>
-        //public override IEnumerable<Relation> GetRelations()
-        //{
-        //    return _relations.Values;
-        //}
-
         /// <summary>
-        /// Clears the data in this cache.
+        /// Clears the data in this cache
         /// </summary>
         public override void Clear()
         {
-            _nodes.Clear();
-            _ways.Clear();
-            _relations.Clear();
+            Nodes.Clear();
+            Ways.Clear();
+            Relations.Clear();
         }
     }
 }
