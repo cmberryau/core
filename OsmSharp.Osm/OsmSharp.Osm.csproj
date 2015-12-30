@@ -83,6 +83,7 @@
     <Compile Include="Change.cs" />
     <Compile Include="ChangeSet.cs" />
     <Compile Include="ChangeSetInfo.cs" />
+    <Compile Include="Collections\OsmGeoCollection.cs" />
     <Compile Include="Complete\CompleteChange.cs" />
     <Compile Include="Complete\CompleteChangeSet.cs" />
     <Compile Include="Complete\CompleteOsmBase.cs" />

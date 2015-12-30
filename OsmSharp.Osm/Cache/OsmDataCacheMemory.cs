@@ -59,8 +59,19 @@ namespace OsmSharp.Osm.Cache
             }
         }
 
+        /// <summary>
+        /// The dictionary of all nodes in the cache
+        /// </summary>
         protected readonly IDictionary<long, Node> Nodes;
+
+        /// <summary>
+        /// The dictionary of all ways in the cache
+        /// </summary>
         protected readonly IDictionary<long, Way> Ways;
+
+        /// <summary>
+        /// The dictionary of all relations in the cache
+        /// </summary>
         protected readonly IDictionary<long, Relation> Relations;
 
         /// <summary>
