@@ -18,10 +18,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OsmSharp.Math.Geo;
 using OsmSharp.Osm.Filters;
+using OsmSharp.Osm.Collections;
+using OsmSharp.Osm.Tiles;
+using OsmSharp.Collections.Tags;
 
 namespace OsmSharp.Osm.Data
 {
@@ -31,11 +32,33 @@ namespace OsmSharp.Osm.Data
     public abstract class DataSourceReadOnlyBase : IDataSourceReadOnly
     {
         /// <summary>
+        /// The default zoom level that this data source reads at
+        /// </summary>
+        public virtual int DefaultZoomLevel 
+        {
+            get
+            {
+                return 15;
+            }
+        }
+
+        /// <summary>
         /// Returns true when this data-source is readonly.
         /// </summary>
         public virtual bool IsReadOnly
         {
             get { return true; }
+        }
+
+        /// <summary>
+        /// Returns true if this datasource supports concurrent copies.
+        /// </summary>
+        public virtual bool SupportsConcurrentCopies
+        {
+            get
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -148,6 +171,64 @@ namespace OsmSharp.Osm.Data
         public abstract IList<OsmGeo> Get(GeoCoordinateBox box, Filter filter);
 
         /// <summary>
+        /// Returns all data within the given tile
+        /// </summary>
+        /// <param name="tile">The tile to fetch geometries from</param>
+        /// <param name="filter">Filtering options for the results</param>
+        /// <returns>An OsmGeoCollection object containing the data within the given tile</returns>
+        public virtual OsmGeoCollection GetCollection(Tile tile, Filter filter)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns all data within the given tiles
+        /// </summary>
+        /// <param name="tiles">The tiles to fetch geometries from</param>
+        /// <param name="filter">Filtering options for the results</param>
+        /// <returns>An OsmGeoCollection object containing the data within the given tile</returns>
+        public virtual OsmGeoCollection GetCollection(IList<Tile> tiles, Filter filter)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns ways matching the tag and values passed
+        /// </summary>
+        public virtual OsmGeoCollection GetGeosGivenTag(OsmGeoType type, string tag, List<string> values)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns ways matching the tags passed
+        /// </summary>
+        public virtual OsmGeoCollection GetGeosGivenTags(OsmGeoType type, Dictionary<string, List<string>> tags)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns the unique tags for the given geo type
+        /// </summary>
+        /// <param name="type">The geo type</param>
+        /// <param name="keys">The key filter, only return tag combinations with these keys</param>
+        public virtual HashSet<TagsCollectionBase> UniqueTags(OsmGeoType type, List<string> keys = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns the unique tags for the given geo type
+        /// </summary>
+        /// <param name="type">The geo type</param>
+        /// <param name="key">The key filter, only return tag combinations with this key</param>
+        public virtual HashSet<TagsCollectionBase> UniqueTags(OsmGeoType type, string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Returns the boundingbox of the data in this datasource.
         /// </summary>
         public abstract GeoCoordinateBox BoundingBox
@@ -169,6 +250,16 @@ namespace OsmSharp.Osm.Data
         public abstract bool HasBoundingBox
         {
             get;
+        }
+
+        /// <summary>
+        /// Provides a copy of the source that is safe to
+        /// read from at the same time as the source and any
+        /// other copies
+        /// </summary>
+        public virtual IDataSourceReadOnly ConcurrentCopy()
+        {
+            throw new NotImplementedException();
         }
     }
 }

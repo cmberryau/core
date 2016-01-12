@@ -417,10 +417,9 @@ namespace OsmSharp.Osm.Tiles
         /// <summary>
         /// Returns the tile at the given location at the given zoom.
         /// </summary>
-        /// <param name="latitude"></param>
-        /// <param name="longitude"></param>
-        /// <param name="zoom"></param>
-        /// <returns></returns>
+        /// <param name="latitude">The latitude to create the tile around</param>
+        /// <param name="longitude">The longitude to create the tile around</param>
+        /// <param name="zoom">The zoom level to create the tile at</param>
         public static Tile CreateAroundLocation(double latitude, double longitude, int zoom)
         {
             int n = (int)System.Math.Floor(System.Math.Pow(2, zoom));
@@ -438,9 +437,8 @@ namespace OsmSharp.Osm.Tiles
         /// <summary>
         /// Returns the tile at the given location at the given zoom.
         /// </summary>
-        /// <param name="location"></param>
-        /// <param name="zoom"></param>
-        /// <returns></returns>
+        /// <param name="location">The coordinate to create the tile around</param>
+        /// <param name="zoom">The zoom level to create the tile at</param>
         public static Tile CreateAroundLocation(GeoCoordinate location, int zoom)
         {
             return Tile.CreateAroundLocation(location.Latitude, location.Longitude, zoom);

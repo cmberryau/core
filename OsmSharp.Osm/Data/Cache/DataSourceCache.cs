@@ -146,7 +146,8 @@ namespace OsmSharp.Osm.Data.Cache
         /// <returns></returns>
         public override IList<Relation> GetRelations(IList<long> ids)
         {
-            List<Relation> relations = new List<Relation>(ids.Count);
+            var relations = new List<Relation>(ids.Count);
+
             for (int idx = 0; idx < relations.Count; idx++)
             {
                 relations.Add(this.GetRelation(ids[idx]));

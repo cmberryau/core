@@ -23,6 +23,9 @@ using System.Text;
 using OsmSharp.Osm;
 using OsmSharp.Math.Geo;
 using OsmSharp.Osm.Filters;
+using OsmSharp.Osm.Collections;
+using OsmSharp.Osm.Tiles;
+using OsmSharp.Collections.Tags;
 
 namespace OsmSharp.Osm.Data
 {
@@ -35,6 +38,11 @@ namespace OsmSharp.Osm.Data
         /// Returns the bounding box of the data in this source if possible.
         /// </summary>
         GeoCoordinateBox BoundingBox { get; }
+
+        /// <summary>
+        /// The default zoom level that this data source reads at
+        /// </summary>
+        int DefaultZoomLevel { get; }
 
         /// <summary>
         /// The unique id for this datasource.
@@ -52,6 +60,17 @@ namespace OsmSharp.Osm.Data
         /// Returns true if this datasource is readonly.
         /// </summary>
         bool IsReadOnly { get; }
+
+        /// <summary>
+        /// Returns true if this datasource supports concurrent copies.
+        /// </summary>
+        bool SupportsConcurrentCopies { get; }
+
+        /// <summary>
+        /// Provides a copy of the IDataSourceReadOnly object that is safe to
+        /// read from at the same time as the source
+        /// </summary>
+        IDataSourceReadOnly ConcurrentCopy();
 
         #endregion
 
@@ -126,6 +145,46 @@ namespace OsmSharp.Osm.Data
         /// <param name="filter"></param>
         /// <returns></returns>
         IList<OsmGeo> Get(GeoCoordinateBox box, Filter filter);
+
+        /// <summary>
+        /// Returns all data within the given tile
+        /// </summary>
+        /// <param name="tile">The tile to fetch geometries from</param>
+        /// <param name="filter">Filtering options for the results</param>
+        /// <returns>An OsmGeoCollection object containing the data within the given tile</returns>
+        OsmGeoCollection GetCollection(Tile tile, Filter filter);
+
+        /// <summary>
+        /// Returns all data within the given tiles
+        /// </summary>
+        /// <param name="tiles">The tiles to fetch geometries from</param>
+        /// <param name="filter">Filtering options for the results</param>
+        /// <returns>An OsmGeoCollection object containing the data within the given tile</returns>
+        OsmGeoCollection GetCollection(IList<Tile> tiles, Filter filter);
+
+        /// <summary>
+        /// Returns all ways matching the tag passed
+        /// </summary>
+        OsmGeoCollection GetGeosGivenTag(OsmGeoType type, string tag, List<string> values);
+
+        /// <summary>
+        /// Returns ways matching the tags passed
+        /// </summary>
+        OsmGeoCollection GetGeosGivenTags(OsmGeoType type, Dictionary<string, List<string>> tags);
+
+        /// <summary>
+        /// Returns the unique tags for the given geo type
+        /// </summary>
+        /// <param name="type">The geo type</param>
+        /// <param name="keys">The key filter, only return tag combinations with these keys</param>
+        HashSet<TagsCollectionBase> UniqueTags(OsmGeoType type, List<string> keys = null);
+
+        /// <summary>
+        /// Returns the unique tags for the given geo type
+        /// </summary>
+        /// <param name="type">The geo type</param>
+        /// <param name="key">The key filter, only return tag combinations with this key</param>
+        HashSet<TagsCollectionBase> UniqueTags(OsmGeoType type, string key);
 
         #endregion
 
