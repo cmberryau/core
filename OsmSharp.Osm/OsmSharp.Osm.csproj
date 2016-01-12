@@ -114,6 +114,11 @@
     <Compile Include="Filters\Tags\FilterTagCount.cs" />
     <Compile Include="Filters\Tags\FilterTagExists.cs" />
     <Compile Include="Filters\Tags\FilterTagMatch.cs" />
+    <Compile Include="Filters\Tags\TagFilter.cs" />
+    <Compile Include="Filters\Tags\TagFilterAdditive.cs" />
+    <Compile Include="Filters\Tags\TagFilterAny.cs" />
+    <Compile Include="Filters\Tags\TagFilterNone.cs" />
+    <Compile Include="Filters\Tags\TagFilterTags.cs" />
     <Compile Include="Geo\Interpreter\FeatureInterpreter.cs" />
     <Compile Include="Geo\Interpreter\SimpleFeatureInterpreter.cs" />
     <Compile Include="Geo\Streams\OsmFeatureStreamSource.cs" />
