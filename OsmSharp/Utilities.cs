@@ -36,6 +36,7 @@ namespace OsmSharp
         /// <summary>
         /// Creates a comma seperated string for the given list of strings
         /// </summary>
+        // TODO: write tests for Utilities.CommaSeperatedString
         public static string CommaSeperatedString(this List<string> values)
         {
             if(values == null)
@@ -63,6 +64,7 @@ namespace OsmSharp
         /// </summary>
         /// <param name="destination">The desintation for the objects to be added</param>
         ///<param name="source">The source from which to get the objects from</param>
+        // TODO: write tests for Utilities.AddRange
         public static void AddRange<T, B>(this ICollection<T> destination, IEnumerable<B> source) where B : T
         {
             foreach (B item in source)
@@ -75,6 +77,7 @@ namespace OsmSharp
         /// Replacement for Dictionary.Values to compatibilize with .NET 3.5
         /// </summary>
 		/// <param name="dictionary">The dictionary to get values from</param>
+        // TODO: write tests for Utilities.Values
         public static List<B> Values<T, B>(this IDictionary<T, B> dictionary)
         {
             var list = new List<B>();
@@ -93,6 +96,7 @@ namespace OsmSharp
         /// Extension for Stream.CopyTo for .NET 3.5
         /// </summary>
         /// <param name="output">The stream to copy to</param>
+        // TODO: write tests for Utilities.CopyTo
         public static void CopyTo(this Stream input, Stream output)
         {
             if (output == null)
@@ -113,6 +117,7 @@ namespace OsmSharp
         /// <summary>
         /// Extension for String.IsNullOrWhiteSpace for .NET 3.5 compatibility
         /// </summary>
+        // TODO: write tests for Utilities.IsNullOrWhiteSpace
         public static bool IsNullOrWhiteSpace(this string value)
         {
             if (value == null)

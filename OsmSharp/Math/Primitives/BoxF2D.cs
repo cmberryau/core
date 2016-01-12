@@ -778,14 +778,15 @@ namespace OsmSharp.Math.Primitives
         /// Returns an enumerator for LineF2D.
         /// </summary>
         /// <returns></returns>
+        // todo : confirm order is correct
         IEnumerator<LineF2D> IEnumerable<LineF2D>.GetEnumerator()
         {
-			List<LineF2D> lines = new List<LineF2D> ();
-			lines.Add (new LineF2D (this.Corners [0], this.Corners [1], true));
-			lines.Add (new LineF2D (this.Corners [1], this.Corners [2], true));
-			lines.Add (new LineF2D (this.Corners [2], this.Corners [3], true));
-			lines.Add (new LineF2D (this.Corners [3], this.Corners [0], true));
-			return lines.GetEnumerator ();
+            var lines = new List<LineF2D> ();
+            lines.Add (new LineF2D (this.Corners [0], this.Corners [1], true));
+            lines.Add(new LineF2D(this.Corners[1], this.Corners[2], true));
+            lines.Add(new LineF2D(this.Corners[2], this.Corners[3], true));
+            lines.Add(new LineF2D(this.Corners[3], this.Corners[0], true));
+            return lines.GetEnumerator ();
         }
     }
 }

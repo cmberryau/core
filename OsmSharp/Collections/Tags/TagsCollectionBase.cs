@@ -16,6 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with OsmSharp. If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -27,6 +28,11 @@ namespace OsmSharp.Collections.Tags
     /// </summary>
     public abstract class TagsCollectionBase : IEnumerable<Tag>, IEnumerable<KeyValuePair<string, string>>, ITagsSource
     {
+        /// <summary>
+        /// Returns the empty and read-only empty tags collection
+        /// </summary>
+        public static TagsCollectionBase Empty => new EmptyTagsCollection();
+
         /// <summary>
         /// Returns the number of tags in this collection.
         /// </summary>
@@ -251,6 +257,51 @@ namespace OsmSharp.Collections.Tags
             {
                 this.RemoveKeyValue(tag);
             }
+        }
+
+        /// <summary>
+        /// Returns the union of the two tags collections
+        /// </summary>
+        // TODO: write tests for TagsCollectionBase.Union
+        public TagsCollectionBase Union(TagsCollectionBase other)
+        {
+            if (other.Count == 0)
+            {
+                return this;
+            }
+
+            if (this.Count == 0)
+            {
+                return other;
+            }
+
+            var union = new TagsCollection();
+
+            // add all from this
+            foreach (var tag in this)
+            {
+                union.Add(tag);
+            }
+
+            // add all from other
+            foreach (var tag in other)
+            {
+                // if it exists in both
+                if (union.ContainsKey(tag.Key))
+                {
+                    // collisions cause exceptions
+                    if (union[tag.Key] != tag.Value)
+                    {
+                        throw new ArgumentException("Contains a collision with collection", nameof(other));
+                    }
+                }
+                else
+                {
+                    union.Add(tag);
+                }
+            }
+
+            return union;
         }
 
         /// <summary>
