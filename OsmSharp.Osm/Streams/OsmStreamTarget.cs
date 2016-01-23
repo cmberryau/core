@@ -153,13 +153,15 @@ namespace OsmSharp.Osm.Streams
         /// <summary>
         /// Pulls the changes from the source to this target.
         /// </summary>
-        public void Pull()
+        /// <param name="ignore_dependencies">Should feature depedencies
+        /// be ignored? (default behaviour is true)</param>
+        public void Pull(bool ignore_dependencies = true)
         {
             _source.Initialize();
             this.Initialize();
             if (this.OnBeforePull())
             {
-                this.DoPull();
+                this.DoPull(ignore_dependencies);
                 this.OnAfterPull();
             }
             this.Flush();
@@ -170,8 +172,15 @@ namespace OsmSharp.Osm.Streams
         /// Pulls the changes from the source to this target.
         /// </summary>
         /// <param name="num_threads">The number of threads to use</param>
-        public void Pull(int num_threads)
+        /// <param name="ignore_dependencies">Should feature depedencies
+        /// be ignored? (default behaviour is true)</param>
+        public void Pull(int num_threads, bool ignore_dependencies = true)
         {
+            if(!ignore_dependencies)
+            {
+                throw new NotSupportedException("Multithreaded pull with depenency order is not yet supported");
+            }
+
             if (num_threads == 0 || num_threads == 1)
             {
                 this.Pull();
@@ -254,7 +263,7 @@ namespace OsmSharp.Osm.Streams
                 available = source.MoveNext();
 
                 if (available)
-                {                    
+                {
                     current = source.Current();
                     _pull_progress++;
                 }
@@ -300,9 +309,11 @@ namespace OsmSharp.Osm.Streams
         /// <summary>
         /// Does the pull operation until source is exhausted.
         /// </summary>
-        protected void DoPull()
+        /// <param name="ignore_dependencies">Should feature depedencies
+        /// be ignored? (default behaviour is true)</param>
+        protected void DoPull(bool ignore_dependencies = true)
         {
-            this.DoPull(false, false, false);
+            this.DoPull(false, false, false, ignore_dependencies);
         }
 
         /// <summary>
@@ -311,33 +322,143 @@ namespace OsmSharp.Osm.Streams
         /// <param name="ignoreNodes">Makes the source skip all nodes.</param>
         /// <param name="ignoreWays">Makes the source skip all ways.</param>
         /// <param name="ignoreRelations">Makes the source skip all relations.</param>
-        protected void DoPull(bool ignoreNodes, bool ignoreWays, bool ignoreRelations)
+        /// <param name="ignore_dependencies">Should feature depedencies
+        /// be ignored? (default behaviour is true)</param>
+        protected void DoPull(bool ignoreNodes, bool ignoreWays, bool ignoreRelations,
+                              bool ignore_dependencies = true)
         {
             _cancel_pull = false;
             _pull_progress = 0;
 
-            while (_source.MoveNext(ignoreNodes, ignoreWays, ignoreRelations))
+            // if we are just pulling down features in any old order
+            if (ignore_dependencies)
             {
-                if (_cancel_pull)
+                while (_source.MoveNext(ignoreNodes, ignoreWays, ignoreRelations))
                 {
-                    return;
+                    if (_cancel_pull)
+                    {
+                        return;
+                    }
+
+                    object sourceObject = _source.Current();
+                    if (sourceObject is Node)
+                    {
+                        this.AddNode(sourceObject as Node);
+                    }
+                    else if (sourceObject is Way)
+                    {
+                        this.AddWay(sourceObject as Way);
+                    }
+                    else if (sourceObject is Relation)
+                    {
+                        this.AddRelation(sourceObject as Relation);
+                    }
+
+                    _pull_progress++;
+                }
+            }
+            else // else, we are taking into account possible dependencies
+            {
+                if (!_source.CanReset)
+                {
+                    throw new Exception("Cannot Pull with depedencies when source is unable to reset.");
                 }
 
-                object sourceObject = _source.Current();
-                if (sourceObject is Node)
+                // dependencies go in order relations->ways->nodes
+
+                // two-pass search for relations to begin
+                while (_source.MoveNext(true, true, false))
                 {
-                    this.AddNode(sourceObject as Node);
-                }
-                else if (sourceObject is Way)
-                {
-                    this.AddWay(sourceObject as Way);
-                }
-                else if (sourceObject is Relation)
-                {
-                    this.AddRelation(sourceObject as Relation);
+                    if (_cancel_pull)
+                    {
+                        return;
+                    }
+
+                    OsmGeo geo = _source.Current();
+
+                    if (geo.Type == OsmGeoType.Relation)
+                    {
+                        AddRelation(geo as Relation);
+                    }
+                    else
+                    {
+                        throw new Exception("OsmGeo type: " + geo.Type.ToString() + " returned from Relation exclusive search.");
+                    }
+
+                    _pull_progress++;
                 }
 
-                _pull_progress++;
+                _source.Reset();
+
+                // second relation phase
+                while (_source.MoveNext(true, true, false))
+                {
+                    if (_cancel_pull)
+                    {
+                        return;
+                    }
+
+                    OsmGeo geo = _source.Current();
+
+                    if (geo.Type == OsmGeoType.Relation)
+                    {
+                        AddRelation(geo as Relation);
+                    }
+                    else
+                    {
+                        throw new Exception("OsmGeo type: " + geo.Type.ToString() + " returned from Relation exclusive search.");
+                    }
+
+                    _pull_progress++;
+                }
+
+                _source.Reset();
+
+                // secondly, ways
+                while (_source.MoveNext(true, false, true))
+                {
+                    if(_cancel_pull)
+                    {
+                        return;
+                    }
+
+                    OsmGeo geo = _source.Current();
+
+                    if(geo.Type == OsmGeoType.Way)
+                    {
+                        AddWay(geo as Way);
+                    }
+                    else
+                    {
+                        throw new Exception("OsmGeo type: " + geo.Type.ToString() + " returned from Way exclusive search.");
+                    }
+
+                    _pull_progress++;
+                }
+
+                _source.Reset();
+
+                // lastly, nodes
+                while (_source.MoveNext(false, true, true))
+                {
+                    if (_cancel_pull)
+                    {
+                        return;
+                    }
+
+                    OsmGeo geo = _source.Current();
+
+                    if (geo.Type == OsmGeoType.Node)
+                    {
+                        AddNode(geo as Node);
+                    }
+                    else
+                    {
+                        throw new Exception("OsmGeo type: " + geo.Type.ToString() + " returned from Node exclusive search.");
+                    }
+
+                    _pull_progress++;
+                }
             }
         }
 

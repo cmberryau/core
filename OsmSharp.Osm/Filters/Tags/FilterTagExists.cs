@@ -49,7 +49,14 @@ namespace OsmSharp.Osm.Filters.Tags
         /// <returns></returns>
         public override bool Evaluate(OsmGeo obj)
         {
-            return obj.Tags.ContainsKey(_tag);
+            var result = false;
+
+            if(obj.Tags != null)
+            {
+                result = obj.Tags.ContainsKey(_tag);
+            }
+
+            return result;
         }
 
         /// <summary>
