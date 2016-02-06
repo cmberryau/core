@@ -183,7 +183,7 @@ namespace OsmSharp.Osm.Streams
 
             if (num_threads == 0 || num_threads == 1)
             {
-                this.Pull();
+                this.Pull(ignore_dependencies);
             }
             else
             {
