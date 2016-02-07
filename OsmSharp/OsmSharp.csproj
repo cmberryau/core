@@ -290,10 +290,10 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if exist $(ProjectDir)..\..\postbuild.bat (
-    $(ProjectDir)..\..\postbuild.bat $(TargetDir) $(TargetName) $(ProjectDir)..\..\..\
-    $(ProjectDir)..\..\postbuild.bat $(TargetDir) Newtonsoft.Json $(ProjectDir)..\..\..\
-    $(ProjectDir)..\..\postbuild.bat $(TargetDir) protobuf-net $(ProjectDir)..\..\..\
+    <PostBuildEvent>if exist $(ProjectDir)..\..\..\postbuild.bat (
+    $(ProjectDir)..\..\..\postbuild.bat $(TargetDir) $(TargetName) $(ProjectDir)..\..\..\
+    $(ProjectDir)..\..\..\postbuild.bat $(TargetDir) Newtonsoft.Json $(ProjectDir)..\..\..\
+    $(ProjectDir)..\..\..\postbuild.bat $(TargetDir) protobuf-net $(ProjectDir)..\..\..\
 )
 </PostBuildEvent>
   </PropertyGroup>
