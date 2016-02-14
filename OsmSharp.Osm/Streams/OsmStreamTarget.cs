@@ -341,6 +341,7 @@ namespace OsmSharp.Osm.Streams
                     }
 
                     object sourceObject = _source.Current();
+
                     if (sourceObject is Node)
                     {
                         this.AddNode(sourceObject as Node);
@@ -366,98 +367,107 @@ namespace OsmSharp.Osm.Streams
 
                 // dependencies go in order relations->ways->nodes
 
-                // two-pass search for relations to begin
-                while (_source.MoveNext(true, true, false))
+                if (!ignoreRelations)
                 {
-                    if (_cancel_pull)
+                    // two-pass search for relations to begin
+                    while (_source.MoveNext(true, true, false))
                     {
-                        return;
+                        if (_cancel_pull)
+                        {
+                            return;
+                        }
+
+                        OsmGeo geo = _source.Current();
+
+                        if (geo.Type == OsmGeoType.Relation)
+                        {
+                            AddRelation(geo as Relation);
+                        }
+                        else
+                        {
+                            throw new Exception("OsmGeo type: " + geo.Type.ToString() + " returned from Relation exclusive search.");
+                        }
+
+                        _pull_progress++;
                     }
 
-                    OsmGeo geo = _source.Current();
+                    _source.Reset();
 
-                    if (geo.Type == OsmGeoType.Relation)
+                    // second relation phase
+                    while (_source.MoveNext(true, true, false))
                     {
-                        AddRelation(geo as Relation);
-                    }
-                    else
-                    {
-                        throw new Exception("OsmGeo type: " + geo.Type.ToString() + " returned from Relation exclusive search.");
+                        if (_cancel_pull)
+                        {
+                            return;
+                        }
+
+                        OsmGeo geo = _source.Current();
+
+                        if (geo.Type == OsmGeoType.Relation)
+                        {
+                            AddRelation(geo as Relation);
+                        }
+                        else
+                        {
+                            throw new Exception("OsmGeo type: " + geo.Type.ToString() + " returned from Relation exclusive search.");
+                        }
+
+                        _pull_progress++;
                     }
 
-                    _pull_progress++;
+                    _source.Reset();
                 }
 
-                _source.Reset();
-
-                // second relation phase
-                while (_source.MoveNext(true, true, false))
+                if (!ignoreWays)
                 {
-                    if (_cancel_pull)
+                    // secondly, ways
+                    while (_source.MoveNext(true, false, true))
                     {
-                        return;
+                        if (_cancel_pull)
+                        {
+                            return;
+                        }
+
+                        OsmGeo geo = _source.Current();
+
+                        if (geo.Type == OsmGeoType.Way)
+                        {
+                            AddWay(geo as Way);
+                        }
+                        else
+                        {
+                            throw new Exception("OsmGeo type: " + geo.Type.ToString() + " returned from Way exclusive search.");
+                        }
+
+                        _pull_progress++;
                     }
 
-                    OsmGeo geo = _source.Current();
-
-                    if (geo.Type == OsmGeoType.Relation)
-                    {
-                        AddRelation(geo as Relation);
-                    }
-                    else
-                    {
-                        throw new Exception("OsmGeo type: " + geo.Type.ToString() + " returned from Relation exclusive search.");
-                    }
-
-                    _pull_progress++;
+                    _source.Reset();
                 }
 
-                _source.Reset();
-
-                // secondly, ways
-                while (_source.MoveNext(true, false, true))
+                if (!ignoreNodes)
                 {
-                    if(_cancel_pull)
+                    // lastly, nodes
+                    while (_source.MoveNext(false, true, true))
                     {
-                        return;
+                        if (_cancel_pull)
+                        {
+                            return;
+                        }
+
+                        OsmGeo geo = _source.Current();
+
+                        if (geo.Type == OsmGeoType.Node)
+                        {
+                            AddNode(geo as Node);
+                        }
+                        else
+                        {
+                            throw new Exception("OsmGeo type: " + geo.Type.ToString() + " returned from Node exclusive search.");
+                        }
+
+                        _pull_progress++;
                     }
-
-                    OsmGeo geo = _source.Current();
-
-                    if(geo.Type == OsmGeoType.Way)
-                    {
-                        AddWay(geo as Way);
-                    }
-                    else
-                    {
-                        throw new Exception("OsmGeo type: " + geo.Type.ToString() + " returned from Way exclusive search.");
-                    }
-
-                    _pull_progress++;
-                }
-
-                _source.Reset();
-
-                // lastly, nodes
-                while (_source.MoveNext(false, true, true))
-                {
-                    if (_cancel_pull)
-                    {
-                        return;
-                    }
-
-                    OsmGeo geo = _source.Current();
-
-                    if (geo.Type == OsmGeoType.Node)
-                    {
-                        AddNode(geo as Node);
-                    }
-                    else
-                    {
-                        throw new Exception("OsmGeo type: " + geo.Type.ToString() + " returned from Node exclusive search.");
-                    }
-
-                    _pull_progress++;
                 }
             }
         }
