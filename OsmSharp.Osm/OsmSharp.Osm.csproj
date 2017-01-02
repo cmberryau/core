@@ -117,6 +117,7 @@
     <Compile Include="Filters\Tags\FilterTagCount.cs" />
     <Compile Include="Filters\Tags\FilterTagExists.cs" />
     <Compile Include="Filters\Tags\FilterTagMatch.cs" />
+    <Compile Include="Filters\Tags\FilterTagPartialMatch.cs" />
     <Compile Include="Filters\Tags\TagFilter.cs" />
     <Compile Include="Filters\Tags\TagFilterAdditive.cs" />
     <Compile Include="Filters\Tags\TagFilterAny.cs" />

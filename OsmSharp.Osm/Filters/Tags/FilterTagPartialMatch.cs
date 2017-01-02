@@ -21,7 +21,7 @@ namespace OsmSharp.Osm.Filters.Tags
     /// <summary>
     /// Filter that filters matching tags.
     /// </summary>
-    internal class FilterTagMatch : FilterTag
+    internal class FilterTagPartialMatch : FilterTag
     {
         /// <summary>
         /// The key to filter on.
@@ -34,11 +34,11 @@ namespace OsmSharp.Osm.Filters.Tags
         private readonly string _value;
 
         /// <summary>
-        /// Creates a new tag filter.
+        /// Creates a new partial tag filter.
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public FilterTagMatch(string key, string value)
+        public FilterTagPartialMatch(string key, string value)
         {
             _key = key;
             _value = value;
@@ -52,11 +52,10 @@ namespace OsmSharp.Osm.Filters.Tags
         public override bool Evaluate(OsmGeo obj)
         {
             string value;
-
             if (obj.Tags != null &&
                 obj.Tags.TryGetValue(_key, out value))
             {
-                return value == _value;
+                return value.Contains(_value);
             }
             return false;
         }
@@ -67,7 +66,7 @@ namespace OsmSharp.Osm.Filters.Tags
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("hastag:key={0} and value={1}",
+            return string.Format("hastag:key={0} and partof value={1}",
                                  _key, _value);
         }
     }

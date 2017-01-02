@@ -138,6 +138,11 @@ namespace OsmSharp.Osm.Filters
             return new FilterTagMatch(tag, value);
         }
 
+        public static Filter MatchPartial(string tag, string partialValue)
+        {
+            return new FilterTagPartialMatch(tag, partialValue);
+        }
+
         /// <summary>
         /// Returns a filter that matches a tag.
         /// </summary>
